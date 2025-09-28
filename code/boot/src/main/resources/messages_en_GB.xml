@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <entry key="email.registration.header">Welcome to Bibliotopia, {0}!</entry>
+    <entry key="email.registration.welcome">We are excited to have you join our community of book lovers. Your reading adventure starts now.</entry>
+</properties>
