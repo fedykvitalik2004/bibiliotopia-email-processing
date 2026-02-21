@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <entry key="email.purchase.subject_he">תודה על הרכישה שלך ב-Bibliotopia</entry>
+    <entry key="email.purchase.header">{0}, תודה על רכישתך</entry>
+    <entry key="email.purchase.message">רכשתם את הספרים הבאים:</entry>
+    <entry key="email.purchase.book.author">מחבר</entry>
+    <entry key="email.purchase.book.title">כותרת</entry>
+    <entry key="email.purchase.book.price">מחיר</entry>
+    <entry key="email.purchase.book.quantity">כמות</entry>
+    <entry key="email.purchase.book.total">סך הכל</entry>
+    <entry key="email.purchase.total">סך הכל:</entry>
+</properties>

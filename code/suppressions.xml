@@ -5,7 +5,7 @@
 
 <suppressions>
     <suppress files="." checks="AbbreviationAsWordInName"/>
-    <suppress files="BibliotopiaEmailProcessingApplication.java" checks="MissingJavadocType"/>
+    <suppress files="BootApplication.java" checks="MissingJavadocType"/>
     <suppress files=".*Test.java" checks="JavadocMethod"/>
     <suppress files=".*IT.java" checks="JavadocMethod"/>
     <suppress files="." checks="LineLength"/>

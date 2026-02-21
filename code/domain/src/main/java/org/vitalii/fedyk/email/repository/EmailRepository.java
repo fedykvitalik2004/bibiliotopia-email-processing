@@ -2,6 +2,7 @@ package org.vitalii.fedyk.email.repository;
 
 import java.util.Locale;
 import java.util.Map;
+import org.vitalii.fedyk.email.model.PurchaseEmailContext;
 
 /**
  * Repository interface for sending emails. Provides an abstraction for email delivery mechanisms,
@@ -21,4 +22,13 @@ public interface EmailRepository {
    */
   void sendEmail(
       String to, String subject, String templateName, Map<String, Object> variables, Locale locale);
+
+  /**
+   * Executes the book purchase email notification process.
+   *
+   * @param context The purchase details provided by the application layer.
+   * @param email The recipient's destination address.
+   * @param locale The locale to be used for translations and formatting.
+   */
+  void sendBooksPurchaseEmail(PurchaseEmailContext context, String email, Locale locale);
 }

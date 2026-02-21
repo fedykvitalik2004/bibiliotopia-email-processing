@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <entry key="email.purchase.subject" >Thanks for your purchase on Bibliotopia</entry>
+    <entry key="email.purchase.header">{0}, thank you for your purchase</entry>
+    <entry key="email.purchase.message">You have purchased the following books:</entry>
+    <entry key="email.purchase.book.author">Author</entry>
+    <entry key="email.purchase.book.title">Title</entry>
+    <entry key="email.purchase.book.price">Price</entry>
+    <entry key="email.purchase.book.quantity">Quantity</entry>
+    <entry key="email.purchase.book.total">Total</entry>
+    <entry key="email.purchase.total">Total:</entry>
+</properties>

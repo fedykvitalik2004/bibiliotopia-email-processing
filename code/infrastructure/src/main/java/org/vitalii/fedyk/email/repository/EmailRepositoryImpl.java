@@ -7,12 +7,14 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Repository;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.vitalii.fedyk.email.exception.EmailSendingException;
+import org.vitalii.fedyk.email.model.PurchaseEmailContext;
 
 @Repository
 @Slf4j
@@ -23,14 +25,18 @@ public class EmailRepositoryImpl implements EmailRepository {
 
   private final String from;
 
+  private final MessageSource messageSource;
+
   @Autowired
   public EmailRepositoryImpl(
       @Value("${spring.mail.username}") final String from,
       final TemplateEngine templateEngine,
-      final JavaMailSender sender) {
+      final JavaMailSender sender,
+      final MessageSource messageSource) {
     this.from = from;
     this.templateEngine = templateEngine;
     this.sender = sender;
+    this.messageSource = messageSource;
   }
 
   @Override
@@ -41,24 +47,38 @@ public class EmailRepositoryImpl implements EmailRepository {
       final Map<String, Object> variables,
       final Locale locale) {
     try {
-      final MimeMessage mimeMessage = sender.createMimeMessage();
+      final MimeMessage mimeMessage = this.sender.createMimeMessage();
       final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
       final Context context = new Context();
       context.setVariables(variables);
       context.setLocale(locale);
 
-      final String content = templateEngine.process(templateName, context);
+      final String content = this.templateEngine.process(templateName, context);
 
       helper.setFrom(from);
       helper.setTo(to);
       helper.setSubject(subject);
       helper.setText(content, true);
 
-      sender.send(mimeMessage);
+      this.sender.send(mimeMessage);
     } catch (MessagingException exception) {
       log.error("Email to {} was not sent", to, exception);
       throw new EmailSendingException("Email not sent", exception);
     }
+  }
+
+  @Override
+  public void sendBooksPurchaseEmail(
+      final PurchaseEmailContext context, final String email, final Locale locale) {
+    final String subject = this.messageSource.getMessage("email.purchase.subject", null, locale);
+
+    final Map<String, Object> data =
+        Map.of(
+            "firstName", context.firstName(),
+            "lastName", context.lastName(),
+            "books", context.books(),
+            "totalOrderPrice", context.totalOrderPrice());
+    this.sendEmail(email, subject, "book_purchase", data, locale);
   }
 }
