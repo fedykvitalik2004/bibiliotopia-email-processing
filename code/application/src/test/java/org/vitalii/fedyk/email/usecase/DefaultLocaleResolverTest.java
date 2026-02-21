@@ -1,6 +1,6 @@
 package org.vitalii.fedyk.email.usecase;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -19,32 +19,37 @@ class DefaultLocaleResolverTest {
 
   @Test
   void resolveLocale_whenLocaleIsNull() {
-    // given
-    final var locale = (String) null;
+    // When
+    final var actual = this.localeResolver.resolveLocale(null);
 
-    // when
-    final var actual = localeResolver.resolveLocale(locale);
+    // Then
+    assertEquals(new Locale("uk", "UA"), actual);
+  }
 
-    // then
-    assertEquals(Locale.UK, actual);
+  @Test
+  void resolveLocale_whenLocaleIsBlank() {
+    // When
+    final var actual = this.localeResolver.resolveLocale("    ");
+
+    // Then
+    assertEquals(new Locale("uk", "UA"), actual);
   }
 
   static Stream<Arguments> localesStream() {
     return Stream.of(
-        Arguments.of(Locale.UK.toLanguageTag(), Locale.UK),
         Arguments.of(
-            Locale.forLanguageTag("uk-UA").toLanguageTag(), Locale.forLanguageTag("uk-UA")),
-        Arguments.of(Locale.FRANCE.toLanguageTag(), Locale.UK),
-        Arguments.of(Locale.forLanguageTag("uk").toLanguageTag(), Locale.UK));
+            "en-US", Locale.forLanguageTag("en-US"),
+            "en", Locale.forLanguageTag("uk-UA"),
+            "he-UA", Locale.forLanguageTag("he-UA")));
   }
 
   @ParameterizedTest
   @MethodSource("localesStream")
   void resolveLocale_whenLocaleIsSupported(final String input, final Locale expected) {
-    // when
+    // When
     final var actual = localeResolver.resolveLocale(input);
 
-    // then
+    // Then
     assertEquals(expected, actual);
   }
 }

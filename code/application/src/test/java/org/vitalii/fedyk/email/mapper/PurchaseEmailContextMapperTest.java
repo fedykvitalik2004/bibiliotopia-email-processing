@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.vitalii.fedyk.email.model.PurchaseEmailContext;
 import org.vitalii.fedyk.sqs.model.BookData;
-import org.vitalii.fedyk.sqs.model.BookPurchaseEvent;
+import org.vitalii.fedyk.sqs.model.PurchaseCompleteEvent;
 
 class PurchaseEmailContextMapperTest {
 
@@ -20,7 +20,7 @@ class PurchaseEmailContextMapperTest {
     final var book2 = new BookData("Clean Code", "Uncle Bob", new BigDecimal("250.559"), 1);
 
     final var event =
-        BookPurchaseEvent.builder()
+        PurchaseCompleteEvent.builder()
             .firstName("John")
             .lastName("Green")
             .books(List.of(book1, book2))

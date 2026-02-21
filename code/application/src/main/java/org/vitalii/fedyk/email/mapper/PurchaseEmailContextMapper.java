@@ -7,11 +7,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.vitalii.fedyk.common.FormattingUtils;
 import org.vitalii.fedyk.email.model.PurchaseEmailContext;
-import org.vitalii.fedyk.sqs.model.BookPurchaseEvent;
+import org.vitalii.fedyk.sqs.model.PurchaseCompleteEvent;
 
 /**
- * Maps {@link BookPurchaseEvent} domain event to {@link PurchaseEmailContext} used for rendering
- * purchase confirmation emails.
+ * Maps {@link PurchaseCompleteEvent} domain event to {@link PurchaseEmailContext} used for
+ * rendering purchase confirmation emails.
  */
 @Component
 @AllArgsConstructor
@@ -30,7 +30,7 @@ public class PurchaseEmailContextMapper {
    * @param event purchase event received from messaging system (must not be null)
    * @return populated {@link PurchaseEmailContext} ready for email rendering
    */
-  public PurchaseEmailContext toEmailContext(final BookPurchaseEvent event) {
+  public PurchaseEmailContext toEmailContext(final PurchaseCompleteEvent event) {
     final Locale locale = Locale.forLanguageTag(event.getLocale());
 
     BigDecimal totalOrderAmount = BigDecimal.ZERO;

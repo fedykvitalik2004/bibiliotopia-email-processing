@@ -7,7 +7,7 @@ import org.vitalii.fedyk.common.LocaleResolver;
 import org.vitalii.fedyk.email.mapper.PurchaseEmailContextMapper;
 import org.vitalii.fedyk.email.model.PurchaseEmailContext;
 import org.vitalii.fedyk.email.repository.EmailRepository;
-import org.vitalii.fedyk.sqs.model.BookPurchaseEvent;
+import org.vitalii.fedyk.sqs.model.PurchaseCompleteEvent;
 
 @Service
 @AllArgsConstructor
@@ -19,7 +19,7 @@ public class EmailProcessingUseCaseImpl implements EmailProcessingUseCase {
   private final PurchaseEmailContextMapper purchaseEmailContextMapper;
 
   @Override
-  public void sendBookPurchaseEmail(final BookPurchaseEvent bookPurchaseData) {
+  public void sendBookPurchaseEmail(final PurchaseCompleteEvent bookPurchaseData) {
     final Locale locale = this.localeResolver.resolveLocale(bookPurchaseData.getLocale());
 
     final PurchaseEmailContext purchaseData =

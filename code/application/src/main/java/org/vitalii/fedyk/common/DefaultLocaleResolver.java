@@ -4,23 +4,26 @@ import java.util.Locale;
 import java.util.Set;
 import org.springframework.stereotype.Component;
 
+/** Resolves a locale from a string representation (language tag). */
 @Component
 public class DefaultLocaleResolver implements LocaleResolver {
-  private final Locale defaultLocale = Locale.UK;
 
-  private final Set<Locale> supportedLocales =
-      Set.of(defaultLocale, Locale.forLanguageTag("uk-UA"));
+  private final Locale defaultLocale = Locale.forLanguageTag("uk-UA");
+
+  private static final Set<String> SUPPORTED_LANGUAGES = Set.of("en", "uk", "he");
 
   @Override
-  public Locale resolveLocale(final String locale) {
-    if (locale == null || !supportedLocales.contains(Locale.forLanguageTag(locale))) {
+  public Locale resolveLocale(final String languageTag) {
+    if (languageTag == null || languageTag.isBlank()) {
       return defaultLocale;
-    } else {
-      return Locale.forLanguageTag(locale);
     }
-  }
 
-  public static void main(String[] args) {
-    System.out.println(Locale.forLanguageTag("uk-UA").toLanguageTag());
+    final Locale locale = Locale.forLanguageTag(languageTag);
+
+    if (!SUPPORTED_LANGUAGES.contains(locale.getLanguage()) || locale.getCountry().isEmpty()) {
+      return defaultLocale;
+    }
+
+    return locale;
   }
 }
