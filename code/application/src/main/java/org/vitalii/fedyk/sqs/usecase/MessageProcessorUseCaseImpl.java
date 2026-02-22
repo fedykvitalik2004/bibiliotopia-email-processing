@@ -2,14 +2,15 @@ package org.vitalii.fedyk.sqs.usecase;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.vitalii.fedyk.email.MessageHandler;
 import org.vitalii.fedyk.sqs.model.Message;
 import org.vitalii.fedyk.sqs.repository.MessageRepository;
 
+// todo: fix according to clean architecture
 @Component
 @Slf4j
 public class MessageProcessorUseCaseImpl implements MessageProcessorUseCase {
@@ -18,9 +19,6 @@ public class MessageProcessorUseCaseImpl implements MessageProcessorUseCase {
   private final ObjectMapper objectMapper;
 
   private final MessageRepository messageRepository;
-
-  @Value("${aws.sqs.queue-url}")
-  private String url;
 
   @Autowired
   public MessageProcessorUseCaseImpl(
@@ -34,40 +32,38 @@ public class MessageProcessorUseCaseImpl implements MessageProcessorUseCase {
 
   @Override
   public void execute() {
-    final List<Message> messages = messageRepository.receiveMessages(url, 10);
+    final CompletableFuture<List<Message>> completableFuture =
+        this.messageRepository.receiveMessages(2);
+    completableFuture.thenAccept(
+        messages -> {
+          log.info("Message amount {}", messages.size());
 
-    for (Message message : messages) {
-      final String type = message.getAttributes().get("className");
+          for (Message message : messages) {
+            final String type = message.getAttributes().get("className");
 
-      if (type == null) {
-        log.warn(
-            "Skipping message with ID {}. 'className' attribute is missing. Message body: {}",
-            message.getId(),
-            message.getBody());
-        continue;
-      }
+            if (type == null) {
+              log.warn(
+                  "Skipping message with ID {}. 'className' attribute is missing. Message body: {}",
+                  message.getId(),
+                  message.getBody());
+              continue;
+            }
 
-      messageHandlers.stream()
-          .filter(handler -> handler.getAttributeName().equals(type))
-          .findFirst()
-          .ifPresent(
-              handler -> {
-                final boolean processed = deserializeAndHandle(handler, message);
-
-                if (processed) {
-                  messageRepository.deleteMessage(url, message.getReceiptHandle());
-                }
-              });
-    }
+            this.messageHandlers.stream()
+                .filter(handler -> handler.getAttributeName().equals(type))
+                .findFirst()
+                .ifPresent(handler -> deserializeAndHandle(handler, message));
+          }
+        });
   }
 
-  private <T> boolean deserializeAndHandle(final MessageHandler<T> handler, final Message msg) {
+  private <T> void deserializeAndHandle(final MessageHandler<T> handler, final Message msg) {
     try {
-      final T obj = objectMapper.readValue(msg.getBody(), handler.getMessageClass());
+      final T obj = this.objectMapper.readValue(msg.getBody(), handler.getMessageClass());
       handler.handle(obj);
-      return true;
+      this.messageRepository.deleteMessage(msg.getReceiptHandle());
     } catch (Exception exception) {
-      return false;
+      log.error("Failed casting from SQS: {}", exception.getMessage());
     }
   }
 }

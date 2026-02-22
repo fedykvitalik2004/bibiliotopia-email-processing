@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-    <entry key="email.purchase.subject_uk">Дякуємо за вашу покупку в Bibliotopia</entry>
-    <entry key="email.purchase.header">{0}, дякуємо за вашу покупку</entry>
+    <entry key="email.purchase.subject">Дякуємо за вашу покупку в Bibliotopia</entry>
+    <entry key="email.purchase.header">{0} {1}, дякуємо за вашу покупку</entry>
     <entry key="email.purchase.message">Ви придбали такі книги:</entry>
     <entry key="email.purchase.book.author">Автор</entry>
     <entry key="email.purchase.book.title">Назва</entry>
     <entry key="email.purchase.book.price">Ціна</entry>
     <entry key="email.purchase.book.quantity">Кількість</entry>
     <entry key="email.purchase.book.total">Разом</entry>
-    <entry key="email.purchase.total">Разом:</entry>
+    <entry key="email.purchase.total">Разом: </entry>
 </properties>

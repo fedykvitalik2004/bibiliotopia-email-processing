@@ -1,56 +1,66 @@
 package org.vitalii.fedyk.sqs.repository;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.vitalii.fedyk.sqs.model.Message;
-import software.amazon.awssdk.services.sqs.SqsClient;
-import software.amazon.awssdk.services.sqs.model.*;
+import org.vitalii.fedyk.sqs.properties.AwsMainProperties;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
+import software.amazon.awssdk.services.sqs.batchmanager.SqsAsyncBatchManager;
+import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
+import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
+import software.amazon.awssdk.services.sqs.model.SqsException;
 
+/** {@inheritDoc} */
+@Slf4j
 @Repository
 public class MessageRepositoryImpl implements MessageRepository {
-  private SqsClient sqsClient;
+  private final SqsAsyncClient sqsClient;
+
+  private final SqsAsyncBatchManager batchManager;
+
+  private final AwsMainProperties awsMainProperties;
 
   @Autowired
-  public MessageRepositoryImpl(final SqsClient sqsClient) {
+  public MessageRepositoryImpl(
+      final SqsAsyncClient sqsClient,
+      final SqsAsyncBatchManager batchManager,
+      final AwsMainProperties awsMainProperties) {
     this.sqsClient = sqsClient;
+    this.batchManager = batchManager;
+    this.awsMainProperties = awsMainProperties;
   }
 
   @Override
-  public Optional<Message> receiveMessage(String queueUrl) {
-    return Optional.empty();
+  public CompletableFuture<List<Message>> receiveMessages(final int maxWaitingSeconds) {
+    final CompletableFuture<ReceiveMessageResponse> responseFuture =
+        batchManager.receiveMessage(
+            builder ->
+                builder
+                    .queueUrl(awsMainProperties.getQueueUrl())
+                    .waitTimeSeconds(Math.min(maxWaitingSeconds, 20)));
+
+    return responseFuture.thenApply(
+        response -> response.messages().stream().map(this::mapToMessage).toList());
   }
 
   @Override
-  public List<Message> receiveMessages(final String queueUrl, final int maxMessages) {
-    try {
-      final ReceiveMessageRequest request =
-          ReceiveMessageRequest.builder()
-              .queueUrl(queueUrl)
-              .maxNumberOfMessages(Math.min(maxMessages, 10))
-              .messageAttributeNames("All")
-              .waitTimeSeconds(3)
-              .messageSystemAttributeNames(MessageSystemAttributeName.ALL)
-              .build();
-
-      final ReceiveMessageResponse response = sqsClient.receiveMessage(request);
-
-      return response.messages().stream().map(this::mapToMessage).toList();
-    } catch (SqsException exception) {
-      return Collections.emptyList();
-    }
-  }
-
-  @Override
-  public void deleteMessage(final String queueUrl, final String receiptHandle) {
+  public void deleteMessage(final String receiptHandle) {
     try {
       final DeleteMessageRequest request =
-          DeleteMessageRequest.builder().queueUrl(queueUrl).receiptHandle(receiptHandle).build();
+          DeleteMessageRequest.builder()
+              .queueUrl(awsMainProperties.getQueueUrl())
+              .receiptHandle(receiptHandle)
+              .build();
 
-      sqsClient.deleteMessage(request);
+      this.sqsClient.deleteMessage(request);
     } catch (SqsException exception) {
-
+      log.error("Message by receiptHandle {} was not deleted. Error happened", receiptHandle);
     }
   }
 
@@ -60,10 +70,7 @@ public class MessageRepositoryImpl implements MessageRepository {
     if (sqsMessage.messageAttributes() != null) {
       sqsMessage
           .messageAttributes()
-          .forEach(
-              (key, value) -> {
-                attributes.put(key, value.stringValue());
-              });
+          .forEach((key, value) -> attributes.put(key, value.stringValue()));
     }
 
     return new Message(

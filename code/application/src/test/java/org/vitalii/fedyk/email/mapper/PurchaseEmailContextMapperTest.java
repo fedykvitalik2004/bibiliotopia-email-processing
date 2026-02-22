@@ -16,8 +16,8 @@ class PurchaseEmailContextMapperTest {
   @Test
   void shouldMapAndFormatCorrectly() {
     // Given
-    final var book1 = new BookData("The Witcher", "Sapkowski", new BigDecimal("100.00"), 2);
-    final var book2 = new BookData("Clean Code", "Uncle Bob", new BigDecimal("250.559"), 1);
+    final var book1 = new BookData("The Witcher", "Sapkowski", new BigDecimal("100.00"), 2000);
+    final var book2 = new BookData("Clean Code", "Uncle Bob", new BigDecimal("250.559"), 12345);
 
     final var event =
         PurchaseCompleteEvent.builder()
@@ -38,17 +38,17 @@ class PurchaseEmailContextMapperTest {
                         .title("The Witcher")
                         .author("Sapkowski")
                         .price("UAH100.00")
-                        .quantity(2)
-                        .lineItemTotal("UAH200.00")
+                        .quantity("2,000")
+                        .lineItemTotal("UAH200,000.00")
                         .build(),
                     PurchaseEmailContext.EmailLineItem.builder()
                         .title("Clean Code")
                         .author("Uncle Bob")
                         .price("UAH250.56")
-                        .quantity(1)
-                        .lineItemTotal("UAH250.56")
+                        .quantity("12,345")
+                        .lineItemTotal("UAH3,093,150.86")
                         .build()))
-            .totalOrderPrice("UAH450.56")
+            .totalOrderPrice("UAH3,293,150.86")
             .build();
 
     // When

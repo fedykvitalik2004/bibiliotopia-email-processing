@@ -1,6 +1,7 @@
 package org.vitalii.fedyk.email.mapper;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,7 @@ public class PurchaseEmailContextMapper {
    */
   public PurchaseEmailContext toEmailContext(final PurchaseCompleteEvent event) {
     final Locale locale = Locale.forLanguageTag(event.getLocale());
+    final NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 
     BigDecimal totalOrderAmount = BigDecimal.ZERO;
     final List<PurchaseEmailContext.EmailLineItem> emailItems = new java.util.ArrayList<>();
@@ -45,7 +47,7 @@ public class PurchaseEmailContextMapper {
               item.getTitle(),
               item.getAuthor(),
               FormattingUtils.getPrice(item.getPrice(), event.getCurrency(), locale),
-              item.getQuantity(),
+              numberFormat.format(item.getQuantity()),
               FormattingUtils.getPrice(lineTotal, event.getCurrency(), locale)));
     }
 
