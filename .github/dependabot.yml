@@ -1,0 +1,30 @@
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directories: 
+      - "/code"
+    assignees:
+      - "fedykvitalik2004"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "[maven] "
+    open-pull-requests-limit: 100
+
+  - package-ecosystem: "docker"
+    directory: "/code"
+    assignees:
+      - "fedykvitalik2004"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "[docker] "
+
+  - package-ecosystem: "docker-compose"
+    directory: "/code"
+    assignees:
+      - "fedykvitalik2004"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "[docker-compose] "
